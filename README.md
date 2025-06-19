@@ -6,4 +6,4 @@ This mod is lightweight, client-side, and built from the ground up for modern Mi
 
 # Website
 
-[https://jamescoalchiportfolio.github.io/ChatTimestamps/](WEBSITE)
+[WEBSITE](https://jamescoalchiportfolio.github.io/ChatTimestamps/)

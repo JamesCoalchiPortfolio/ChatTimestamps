@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Timestamps - Minecraft Mod</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Chat Timestamps</h1>
+            <p class="tagline">Adds a timestamp to every received chat message :3 Ported for newer versions!</p>
+            <div class="button-group">
+                <a href="https://github.com/JamesCoalchiPortfolio/ChatTimestamps/issues" target="_blank" class="btn btn-primary">Report an Issue</a>
+                <a href="https://github.com/JamesCoalchiPortfolio/ChatTimestamps" target="_blank" class="btn btn-secondary">View Source Code</a>
+            </div>
+        </header>
+
+        <main>
+            <section id="about">
+                <h2>About The Mod</h2>
+                <p>
+                    Today I had an idea to find a simple mod to add timestamps to my Minecraft chat. When I looked on Modrinth, I found some great options, but they were built for older versions like 1.19. Since I was playing on <strong>Fabric 1.21</strong>, I decided to create my own!
+                </p>
+                <p>
+                    This mod is lightweight, client-side, and built from the ground up for modern Minecraft versions. I also wanted to make it flexible, so I added a complete configuration screen where you can tailor the timestamps to your exact preferences.
+                </p>
+            </section>
+
+            <section id="configurator">
+                <h2>Easy Configuration</h2>
+                <p>
+                    Tweak the look and feel of your timestamps with an easy-to-use in-game config screen (requires <a href="https://modrinth.com/mod/modmenu" target="_blank">ModMenu</a>). You can customize the <strong>timestamp format</strong> and choose from a variety of <strong>colors</strong> to match your style. <strong>Try out the options live below!</strong>
+                </p>
+                <div class="live-config-container">
+                    <div class="config-preview-box">
+                        <p class="preview-chat-line">
+                            <span class="preview-timestamp">[14:08:12]</span>
+                            <span class="preview-chat-text"><Player123> This is a preview!</span>
+                        </p>
+                         <p class="preview-chat-line">
+                            <span class="preview-timestamp">[14:08:13]</span>
+                            <span class="preview-chat-text"><AnotherPlayer> Wow, cool!</span>
+                        </p>
+                    </div>
+            
+                    <div class="config-controls">
+                         <div class="config-row">
+                            <label for="color-input">Timestamp Color</label>
+                            <div class="color-controls-group">
+                                <input type="color" id="color-input" value="#AAAAAA">
+                                <input type="text" id="color-hex-display" readonly>
+                                <button id="copy-color-btn" class="btn btn-secondary">Copy</button>
+                            </div>
+                            <button id="color-reset" class="btn btn-secondary">Reset</button>
+                        </div>
+                        <div class="config-row">
+                            <label for="format-input">Timestamp Format</label>
+                            <input type="text" id="format-input" value="HH:mm:ss">
+                             <div class="button-group-inline">
+                                <button id="format-clear" class="btn btn-secondary">Copy</button>
+                                <button id="format-reset" class="btn btn-secondary">Reset</button>
+                            </div>
+                        </div>
+                         <div class="format-helpers">
+                            <span class="helper-label">Format Builder:</span>
+                            <button class="btn btn-helper" data-format="HH">Hours (24h)</button>
+                            <button class="btn btn-helper" data-format="h">Hours (12h)</button>
+                            <button class="btn btn-helper" data-format="mm">Mins</button>
+                            <button class="btn btn-helper" data-format="ss">Secs</button>
+                            <button class="btn btn-helper" data-format="ms">ms</button>
+                            <button class="btn btn-helper" data-format="a">am/pm</button>
+                            <button class="btn btn-helper" data-format=":"> : </button>
+                            <button class="btn btn-helper" data-format="."> . </button>
+                            <button class="btn btn-helper" data-format="/"> / </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="gallery">
+                <h2>Gallery</h2>
+                <div class="gallery-container">
+                    <img src="assets/chattimestamps.png" alt="Main config screen" class="gallery-image">
+                </div>
+            </section>
+
+            <section id="requirements">
+                <h2>Requirements</h2>
+                <ul>
+                    <li>Fabric Loader</li>
+                    <li><a href="https://modrinth.com/mod/fabric-api" target="_blank">Fabric API</a></li>
+                    <li><a href="https://modrinth.com/mod/cloth-config" target="_blank">Cloth Config API</a></li>
+                </ul>
+                <h3>Recommended</h3>
+                <ul>
+                    <li><a href="https://modrinth.com/mod/modmenu" target="_blank">ModMenu</a> (for easy access to the config screen)</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>Created by JamesCoalchi | Licensed under the MIT License.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const formatInput = document.getElementById('format-input');
+            const colorInput = document.getElementById('color-input');
+            const colorHexDisplay = document.getElementById('color-hex-display');
+            const copyColorBtn = document.getElementById('copy-color-btn');
+            const formatResetBtn = document.getElementById('format-reset');
+            const formatClearBtn = document.getElementById('format-clear');
+            const colorResetBtn = document.getElementById('color-reset');
+            const timestampSpans = document.querySelectorAll('.preview-timestamp');
+            const formatHelperBtns = document.querySelectorAll('.btn-helper');
+    
+            // --- Defaults & Config ---
+            const DEFAULT_FORMAT = 'HH:mm:ss';
+            const DEFAULT_COLOR = '#AAAAAA'; // Default gray color
+    
+            // --- Helper Functions ---
+            const pad = (num, length = 2) => String(num).padStart(length, '0');
+    
+            const formatTimestamp = (date, formatStr) => {
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const seconds = date.getSeconds();
+                const milliseconds = date.getMilliseconds();
+    
+                const h12 = hours % 12 || 12; // 12-hour format (1-12)
+    
+                return formatStr
+                    .replace(/HH/g, pad(hours))
+                    .replace(/h/g, pad(h12))
+                    .replace(/mm/g, pad(minutes))
+                    .replace(/ss/g, pad(seconds))
+                    .replace(/ms/g, pad(milliseconds, 3))
+                    .replace(/a/g, hours >= 12 ? 'pm' : 'am');
+            };
+    
+            // --- Core Update Function ---
+            const updatePreview = () => {
+                const now = new Date();
+                const format = "[" + formatInput.value + "]" || DEFAULT_FORMAT;
+                const colorHex = colorInput.value || DEFAULT_COLOR;
+    
+                const formattedTime = formatTimestamp(now, format);
+                
+                colorHexDisplay.value = colorHex.toUpperCase();
+    
+                timestampSpans.forEach(span => {
+                    span.textContent = formattedTime;
+                    span.style.color = colorHex;
+                });
+            };
+    
+            // --- Event Listeners ---
+            formatInput.addEventListener('input', updatePreview);
+            colorInput.addEventListener('input', updatePreview);
+    
+            formatResetBtn.addEventListener('click', () => {
+                formatInput.value = DEFAULT_FORMAT;
+                updatePreview();
+            });
+            
+            formatClearBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(formatInput.value).then(() => {
+                    const originalText = formatClearBtn.textContent;
+                    formatClearBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        formatClearBtn.textContent = originalText;
+                    }, 1500);
+                });
+            });
+    
+            colorResetBtn.addEventListener('click', () => {
+                colorInput.value = DEFAULT_COLOR;
+                updatePreview();
+            });
+
+            copyColorBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(colorHexDisplay.value).then(() => {
+                    const originalText = copyColorBtn.textContent;
+                    copyColorBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyColorBtn.textContent = originalText;
+                    }, 1500);
+                });
+            });
+    
+            formatHelperBtns.forEach(button => {
+                button.addEventListener('click', () => {
+                    const formatCode = button.getAttribute('data-format');
+                    formatInput.value += formatCode;
+                    formatInput.focus();
+                    updatePreview();
+                });
+            });
+            
+            // --- Initialization ---
+            updatePreview(); // Initial call
+            setInterval(updatePreview, 1000); // Update time every second
+        });
+    </script>
+
+</body>
+</html>

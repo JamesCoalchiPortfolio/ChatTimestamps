@@ -1,0 +1,43 @@
+{
+	"schemaVersion": 1,
+	"id": "chat-timestamps",
+	"version": "1.0.0",
+	"name": "Chat Timestamps",
+	"description": "Adds a timestamp to every received chat message :3\nPorted for newer versions!",
+	"authors": [
+		{
+			"name": "JamesCoalchi",
+			"contact": {
+				"email": "jamescoalchi@gmail.com"
+			}
+		}
+	],
+	"contact": {
+		"homepage": "example.com for now",
+		"sources": "https://github.com/JamesCoalchiPortfolio/ChatTimestamps",
+		"issues": "https://github.com/JamesCoalchiPortfolio/ChatTimestamps/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/chat-timestamps/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [ "com.jamescoalchi.chattimestamps.ChatTimestampsClient" ],
+		"modmenu": [ "com.jamescoalchi.chattimestamps.ModMenuIntegration" ]
+	},
+	"mixins": [
+		{
+			"config": "chat-timestamps.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*",
+		"cloth-config": ">=15.0.140"
+	},
+	"suggests": {
+		"modmenu": ">=11.0.3"
+	}
+}
